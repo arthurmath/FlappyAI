@@ -2,7 +2,7 @@ import random as rd
 import pickle
 import os
 import matplotlib.pyplot as plt
-from newpilot import Pilot
+from pilot import Pilot
 from game import Session
 from pathlib import Path
 import copy as cp
@@ -100,11 +100,9 @@ class GeneticAlgo:
     
     def select_parents(self):
         """Select two pilots with high scores."""
-        total_scores = sum(self.bestscores)
-        ratios = [f / total_scores for f in self.bestscores]
-        # total_scores = sum(self.scores)
-        # ratios = [f / total_scores for f in self.scores]
-        return rd.choices(self.bestPilots, k=2) # return a k-sized list 
+        total_scores = sum(self.scores)
+        ratios = [f / total_scores for f in self.scores]
+        return rd.choices(self.population, weights=ratios, k=2) # return a k-sized list 
 
 
     
@@ -167,5 +165,4 @@ if __name__ == "__main__":
 # Generation 1, average score: 25, best score: 177
 # Generation 2, average score: 30, best score: 946
 # Generation 3, average score: 41, best score: 1667
-
 

@@ -4,7 +4,7 @@ import random as rd
 
 
 SEED = 42
-MUTATION_RATE = 0.5
+MUTATION_RATE = 0.1
 STD_MUTATION = 0.3
 NN_LAYERS = [4, 3, 3, 1]
 
@@ -40,13 +40,13 @@ class Pilot():
         self.bias = []
         for layer in self.weights:
             nbrBias = np.size(layer, axis=1)
-            self.bias.append(np.array([rd.uniform(-1, 1) for _ in range(nbrBias)])) # rd.gauss(0, 0.5)
+            self.bias.append(np.matrix([rd.uniform(-1, 1) for _ in range(nbrBias)])) # rd.gauss(0, 0.5)
             
     
     def predict(self, vector):
         for weight, bias in zip(self.weights, self.bias):
             vector = np.dot(np.array(vector), np.matrix(weight)) + np.array(bias)
-            vector = self.relu(vector)
+            vector = self.heaviside(vector)
 
         return vector
     
@@ -74,7 +74,7 @@ class Pilot():
     
     def crossover(self, dna1, dna2):
         """ Performs a crosover on the layers (weights and biases) """
-        res = [ self.cross_layer(dna1[layer], dna2[layer]) for layer in range(len(dna1)) ]
+        res = [self.cross_layer(dna1[layer], dna2[layer]) for layer in range(len(dna1))]
         return res
 
     def cross_layer(self, layer1, layer2): # better
@@ -104,16 +104,16 @@ class Pilot():
             for i in range(len(layer1)):
                 for j in range(len(layer1[0])):
                     if rd.random() > 0.5:
-                        res[i][j] = layer2[i][j]
+                        res[i, j] = layer2[i, j]
         
         return res
     
 
     def mutate(self):
-        for layer in self.weights:
-            self.mutate_layer(layer)
-        for layer in self.bias:
-            self.mutate_layer(layer)
+        for i, layer in enumerate(self.weights):
+            self.weights[i] = self.mutate_layer(layer)
+        for i, layer in enumerate(self.bias):
+            self.bias[i] = self.mutate_layer(layer)
             
 
     def mutate_layer(self, layer):
@@ -121,7 +121,8 @@ class Pilot():
         
         mask = np.random.rand(*layer.shape) < MUTATION_RATE # Tableau de True et False
         mutations = np.clip(np.random.normal(0, STD_MUTATION, size=layer.shape), -1, 1) # -1 < mutations < 1 (stabilité numérique)
-        layer = np.where(mask, layer + mutations, layer)  # condition, valeur_si_vrai, valeur_si_faux (layer += mask * mutations) 
+        layer = np.where(mask, layer + mutations, layer)  # condition, valeur_si_vrai, valeur_si_faux (layer += mask * mutations)
+        return np.matrix(layer)
 
 
     
@@ -135,22 +136,27 @@ if __name__ == '__main__':
 
     pilot1 = Pilot()
     pilot2 = Pilot()
+   
+    pilot1.mutate()
+    baby = pilot1.mate(pilot2)
+    baby.mutate()
+    baby2 = baby.mate(pilot1)
+    baby2.mutate()
+    
 
-    action1 = pilot1.predict(state)
-    print(action1.tolist()[0][0])
-    
-    action2 = pilot2.predict(state)
-    print(action2.tolist()[0][0])
     
     
     
+    # action1 = pilot1.predict(state)
+    # print(action1.tolist()[0][0])
+    
+    # action2 = pilot2.predict(state)
+    # print(action2.tolist()[0][0])
+    
+    # for layer in pilot1.weights:
+    #     print(layer.shape)
+    
+    # print()
     
     
     
-    
-    
-    
-# predict()
-# if weight.all() != self.weights[0].all():
-#     vector = self.heaviside(vector)
-# else:
