@@ -114,11 +114,11 @@ class Pipe:
             self.ses.add_pipe = True
         
         # Fait beuger le mouvement des pipes 
-        # if self.pipe_img_rect.left <= -70:
-        #     self.ses.pipes.pop(0)
-        # else:
-        self.pipe_img_rect.right -= self.pipe_velocity
-        self.flipped_pipe_rect.right -= self.pipe_velocity
+        if self.pipe_img_rect.left <= -70:
+            self.ses.pipes.pop(0)
+        else:
+            self.pipe_img_rect.right -= self.pipe_velocity
+            self.flipped_pipe_rect.right -= self.pipe_velocity
                        
                     
     def draw(self):

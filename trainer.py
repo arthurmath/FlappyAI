@@ -2,7 +2,7 @@ import random as rd
 import pickle
 import os
 import matplotlib.pyplot as plt
-from pilot import Pilot
+from newpilot import Pilot
 from game import Session
 from pathlib import Path
 import copy as cp
@@ -41,6 +41,9 @@ class GeneticAlgo:
             print(f"Generation {self.generation+1}, average score: {self.avgGenScore:.0f}, best score: {self.bestGenScore}")
             self.generation += 1
             
+            # if self.ses.done:
+            #     break
+            
         self.evaluate_generation() # Evaluate the last generation
         self.bests_survives()
         self.bestPilotEver = self.bestPilots[-1]
@@ -55,7 +58,7 @@ class GeneticAlgo:
 
         while not ses.done:
             for event in pg.event.get():
-                if event.type == pg.K_ESCAPE:
+                if event.type == pg.QUIT:
                     ses.done = True
             
             actions = [self.population[i].predict(states[i]) for i in range(len(self.population))]
@@ -101,7 +104,7 @@ class GeneticAlgo:
         ratios = [f / total_scores for f in self.bestscores]
         # total_scores = sum(self.scores)
         # ratios = [f / total_scores for f in self.scores]
-        return rd.choices(self.bestPilots,  k=2) # return a k-sized list 
+        return rd.choices(self.bestPilots, k=2) # return a k-sized list 
 
 
     
@@ -161,4 +164,8 @@ if __name__ == "__main__":
 # Generation 6, average score: 70, best score: 457
 
 # choice dans bestPilots sans ratios
+# Generation 1, average score: 25, best score: 177
+# Generation 2, average score: 30, best score: 946
+# Generation 3, average score: 41, best score: 1667
+
 
