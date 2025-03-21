@@ -199,6 +199,7 @@ class Session:
         self.text = pg.font.SysFont('forte', 30)
         self.highscore = 0
         self.done = False
+        self.quit = False
         self.loop_counter = 0
         self.level = 1
         self.level_up_rate = 250
@@ -268,7 +269,9 @@ class Session:
     def step(self, actions):
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                print("QUIT GAME")
                 self.done = True
+                self.quit = True
         
         self.loop_counter += 1
         self.update(actions)

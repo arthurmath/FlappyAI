@@ -6,8 +6,6 @@ from pilot import Pilot
 from game import Session
 from pathlib import Path
 import copy as cp
-import pygame as pg
-pg.init()
 
 
     
@@ -38,32 +36,31 @@ class GeneticAlgo:
             self.bests_survives()
             self.change_generation()
             
+            if self.ses.quit:
+                break
+            
             print(f"Generation {self.generation+1}, average score: {self.avgGenScore:.0f}, best score: {self.bestGenScore}")
             self.generation += 1
-            
-            # if self.ses.done:
-            #     break
-            
-        self.evaluate_generation() # Evaluate the last generation
-        self.bests_survives()
-        self.bestPilotEver = self.bestPilots[-1]
+        
+        if not self.ses.quit:
+            self.evaluate_generation() # Evaluate the last generation
+            self.bests_survives()
+            self.bestPilotEver = self.bestPilots[-1]
         
 
 
     def evaluate_generation(self):
         self.scores = []
+        # self.quit = False
             
-        ses = Session(POPULATION, self.generation)
-        states = ses.reset()
+        self.ses = Session(POPULATION, self.generation)
+        states = self.ses.reset()
 
-        while not ses.done:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    ses.done = True
+        while not self.ses.done:
             
             actions = [self.population[i].predict(states[i]) for i in range(len(self.population))]
             actions = [mat.tolist()[0][0] for mat in actions]
-            states, self.scores = ses.step(actions)
+            states, self.scores = self.ses.step(actions)
             
         self.bestGenScore = max(self.scores)
         self.avgGenScore = sum(self.scores) / POPULATION
@@ -141,7 +138,7 @@ if __name__ == "__main__":
 
 
 
-# Attente d'un NN qui sait jouer est plus rapide sans weights=ratios
+# Atteinte d'un NN qui sait jouer est plus rapide sans weights=ratios
 
 
 
