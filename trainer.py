@@ -102,7 +102,7 @@ class GeneticAlgo:
         """Select two pilots with high scores."""
         total_scores = sum(self.scores)
         ratios = [f / total_scores for f in self.scores]
-        return rd.choices(self.population, weights=ratios, k=2) # return a k-sized list 
+        return rd.choices(self.bestPilots, k=2) # return a k-sized list 
 
 
     
