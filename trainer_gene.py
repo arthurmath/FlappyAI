@@ -22,7 +22,6 @@ N_GENERATIONS = 20
 
 class GeneticAlgo:
     
-
     def train(self):
         
         self.list_scores = []
@@ -45,12 +44,11 @@ class GeneticAlgo:
         if not self.ses.quit:
             self.evaluate_generation() # Evaluate the last generation
             self.bests_survives()
-            self.bestPilotEver = self.bestPilots[-1]
+            self.bestPilotEver = self.bestPilots[0]
         
 
 
     def evaluate_generation(self):
-        self.scores = []
         # self.quit = False
             
         self.ses = Session(POPULATION, self.generation)
@@ -97,8 +95,8 @@ class GeneticAlgo:
     
     def select_parents(self):
         """Select two pilots with high scores."""
-        total_scores = sum(self.scores)
-        ratios = [f / total_scores for f in self.scores]
+        # total_scores = sum(self.scores)
+        # ratios = [f / total_scores for f in self.scores]
         return rd.choices(self.bestPilots, k=2) # return a k-sized list 
 
 

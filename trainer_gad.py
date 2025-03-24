@@ -58,44 +58,55 @@ gann = pygad.gann.GANN(num_solutions=POPULATION,
                        output_activation="softmax",
                        )
 
-initial_pop = pygad.gann.population_as_vectors(population_networks=gann.population_networks)
 
-
-# Définition des paramètres de l'algorithme génétique
-ga_instance = pygad.GA(num_generations = N_GENERATIONS,
-                    num_parents_mating = 10,
-                    initial_population = initial_pop,
-                    fitness_func = fitness_function,
-                    mutation_percent_genes = 10,
-                    crossover_type = 'single_point',
-                    mutation_type = 'random',
-                    parent_selection_type = 'tournament',
-                    keep_parents = 2, 
-                    init_range_high = 1,
-                    init_range_low = -1,
-                    random_seed = SEED,
-                    fitness_batch_size = BATCH,
-                    # parallel_processing = 5,
-                    on_generation=callback,
-                    )
-
-# Exécution de l'algorithme génétique
-ga_instance.run()
-
-# Récupération du meilleur individu
-solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print(f"Meilleure solution: {solution}")
-print(f"Fitness: {solution_fitness}")
+for i, nn in enumerate(gann.population_networks):
+    print(f"NN {i} Weights: {nn}")
 
 
 
 
-# if __name__ == '__main__':
-#     train()
 
 
 
 
-# pourquoi nn_idx passe de len 32 à 31 au bout de 3 steps ? 
-# Quel est le lien entre population et batch ? 
-# Est ce que update_population_trained_weights est nécessaire ? 
+# initial_pop = pygad.gann.population_as_vectors(population_networks=gann.population_networks)
+
+
+# # Définition des paramètres de l'algorithme génétique
+# ga_instance = pygad.GA(num_generations = N_GENERATIONS,
+#                     num_parents_mating = 10,
+#                     initial_population = initial_pop,
+#                     # sol_per_pop = POPULATION,
+#                     # num_genes = X,
+#                     fitness_func = fitness_function,
+#                     mutation_percent_genes = 10,
+#                     crossover_type = 'single_point',
+#                     mutation_type = 'random',
+#                     parent_selection_type = 'tournament',
+#                     keep_parents = 2, 
+#                     init_range_high = 1,
+#                     init_range_low = -1,
+#                     random_seed = SEED,
+#                     fitness_batch_size = BATCH,
+#                     # parallel_processing = 5,
+#                     on_generation=callback,
+#                     )
+
+# # Exécution de l'algorithme génétique
+# ga_instance.run()
+
+# # Récupération du meilleur individu
+# solution, solution_fitness, solution_idx = ga_instance.best_solution()
+# print(f"Meilleure solution: {solution}")
+# print(f"Fitness: {solution_fitness}")
+
+
+
+
+
+
+
+
+# # pourquoi nn_idx passe de len 32 à 31 au bout de 3 steps ? 
+# # Quel est le lien entre population et batch ? 
+# # Est ce que update_population_trained_weights est nécessaire ? 

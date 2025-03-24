@@ -269,7 +269,6 @@ class Session:
     def step(self, actions):
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                print("QUIT GAME")
                 self.done = True
                 self.quit = True
         
