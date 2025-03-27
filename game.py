@@ -14,7 +14,7 @@ SEED = 42
 WIDTH = 1200
 HEIGHT = 600
 WHITE = (255, 255, 255)
-FPS = 30 
+FPS = 100 
 GRAVITY = 2      # Accélération due à la gravité
 JUMP_STRENGTH = -15  # Vélocité initiale du saut (négatif car va vers le haut)
 MAX_SPEED = 120  # Vitesse max de chute
@@ -97,8 +97,8 @@ class Pipe:
 
     def __init__(self, ses):
         self.ses = ses
-        self.hole = random.randint(-30, 200) # old
-        # self.hole = random.randint(-40, 200) 
+        # self.hole = random.randint(-30, 200) # old easy
+        self.hole = random.randint(-40, 200) 
         
         self.pipe_img = self.ses.pipe_img
         self.flipped_pipe = ses.flipped_pipe
@@ -107,8 +107,8 @@ class Pipe:
         self.pipe_img_rect.top = HEIGHT/2 + self.hole
         self.pipe_img_rect.right = WIDTH + 70
         self.flipped_pipe_rect = self.flipped_pipe.get_rect()
-        self.flipped_pipe_rect.top = HEIGHT/2 - 700 + self.hole # old
-        # self.flipped_pipe_rect.top = HEIGHT/2 - 650 + self.hole
+        # self.flipped_pipe_rect.top = HEIGHT/2 - 700 + self.hole # old easy
+        self.flipped_pipe_rect.top = HEIGHT/2 - 650 + self.hole
         self.flipped_pipe_rect.right = WIDTH + 70
         
     def update(self):
@@ -192,7 +192,7 @@ class Score:
 
 
 class Session:
-    def __init__(self, nb_pilots=10, generation=1):
+    def __init__(self, nb_pilots=10, generation=1, display=True):
         pg.init()
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -200,6 +200,7 @@ class Session:
         self.title = pg.font.SysFont('forte', 60)
         self.text = pg.font.SysFont('forte', 30)
         self.highscore = 0
+        self.display = display
         self.done = False
         self.quit = False
         self.loop_counter = 0
@@ -276,7 +277,8 @@ class Session:
         
         self.loop_counter += 1
         self.update(actions)
-        self.draw()
+        if self.display:
+            self.draw()
         
         dones = [bird.alive for bird in self.bird_list]
         if not any(dones):

@@ -5,7 +5,7 @@ import random as rd
 
 SEED = 42
 MUTATION_RATE = 0.1
-STD_MUTATION = 0.3
+STD_MUTATION = 0.1
 NN_LAYERS = [4, 5, 5, 1]
 
 np.random.seed(SEED)
@@ -33,14 +33,14 @@ class Pilot():
         for i in range(len(NN_LAYERS) - 1): 
             # Pour chaque couche du NN, creation d'une matrice de poids 
             layer = [[rd.uniform(-1, 1) for _ in range(NN_LAYERS[i+1])] for _ in range(NN_LAYERS[i])] # rd.gauss(0, 0.5)
-            self.weights.append(np.matrix(layer))
+            self.weights.append(np.array(layer))
             
         
     def initialize_bias(self):
         self.bias = []
         for layer in self.weights:
-            nbrBias = np.size(layer, axis=1)
-            self.bias.append(np.array([rd.uniform(-1, 1) for _ in range(nbrBias)])) # rd.gauss(0, 0.5)
+            nb_bias = np.size(layer, axis=1)
+            self.bias.append(np.array([rd.uniform(-1, 1) for _ in range(nb_bias)])) # rd.gauss(0, 0.5)
             
     
     def predict(self, vector):
@@ -79,6 +79,7 @@ class Pilot():
 
     def cross_layer(self, layer1, layer2): # better
         """ Performs a crossover on two layers """
+        
         lineCut = rd.randint(0, layer1.shape[0] - 1)
         if len(layer1.shape) == 1:  # 1D case
             return np.hstack((layer1[:lineCut], layer2[lineCut:]))
@@ -122,7 +123,7 @@ class Pilot():
         mask = np.random.rand(*layer.shape) < MUTATION_RATE # Tableau de True et False
         mutations = np.clip(np.random.normal(0, STD_MUTATION, size=layer.shape), -1, 1) # -1 < mutations < 1 (stabilité numérique)
         layer = np.where(mask, layer + mutations, layer)  # condition, valeur_si_vrai, valeur_si_faux (layer += mask * mutations)
-        return np.matrix(layer)
+        return np.array(layer)
 
 
     
