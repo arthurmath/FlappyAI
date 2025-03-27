@@ -1,31 +1,76 @@
+import random as rd
 import numpy as np
 import random as rd
+from collections import deque
+# import tensorflow as tf
 
-
-# layer1 = np.ones((5, 10))
-# layer2 = 2 * np.ones((5, 10))
-
-
-
-# lineCut = rd.randint(0, layer1.shape[0] - 1)
-
-# columnCut = rd.randint(0, layer1.shape[1] - 1)
-
-# res = np.vstack((
-#     layer1[:lineCut],
-#     np.hstack((layer1[lineCut, :columnCut], layer2[lineCut, columnCut:])),
-#     layer2[lineCut + 1 :],
-#     ))
-
-
-# # print(res)
-
-# # [[1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
-# #  [1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
-# #  [1. 1. 1. 2. 2. 2. 2. 2. 2. 2.]
-# #  [2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]
-# #  [2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]]
+# SEED = 42
+# rd.seed(SEED)
+# tf.random.set_seed(SEED)
 
 
 
 
+# model = tf.keras.Sequential([
+#             tf.keras.layers.Input([3]),
+#             tf.keras.layers.Dense(5, activation="elu"),
+#             tf.keras.layers.Dense(1)
+#         ])
+
+
+# # print(model.weights[0].numpy())
+# # print(model.count_params())
+# print(model.summary())
+
+# # for i in range(len(model.weights)):
+# #     print(model.weights[i].numpy().shape)
+# # print()
+
+
+
+
+# print("start")
+# if 0.00:
+#     print("true")
+
+
+
+
+class ReplayMemory:
+    def __init__(self, capacity):
+        self.memory = deque(maxlen=capacity)
+    
+    def push(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
+    
+    def sample(self):
+        samples = rd.sample(self.memory, 32)
+        return zip(*samples)
+    
+    def __len__(self):
+        return len(self.memory)
+    
+    
+memory = ReplayMemory(100)
+for i in range(60):
+    memory.push(i, i, i, i, i)
+    
+
+batch_state, batch_action, batch_reward, batch_next_state, batch_done = memory.sample()
+
+print(batch_state)
+    
+    
+
+# replay_buffer = deque(maxlen=2000)
+
+# def sample_experiences():
+#     indices = np.random.randint(len(replay_buffer), size=32)
+#     batch = [replay_buffer[index] for index in indices]
+#     return [[experience[field_index] for experience in batch] for field_index in range(5)] 
+
+
+# for i in range(10):
+#     replay_buffer.append((i, i, i, i, i))
+    
+# print(sample_experiences())

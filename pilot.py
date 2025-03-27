@@ -6,7 +6,7 @@ import random as rd
 SEED = 42
 MUTATION_RATE = 0.1
 STD_MUTATION = 0.3
-NN_LAYERS = [4, 3, 3, 1]
+NN_LAYERS = [4, 5, 5, 1]
 
 np.random.seed(SEED)
 rd.seed(SEED)

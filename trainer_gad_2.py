@@ -2,7 +2,9 @@ import numpy as np
 import pygad
 import pygad.nn
 import pygad.gann
+import pygad.kerasga
 from game import Session
+import tensorflow as tf
 
 
 SEED = 42
@@ -15,70 +17,45 @@ EPISODE_INCREASE = 2
 NN_LAYERS = [4, 3, 3, 1]
 
 
-
-# Ne peut pas marcher car data_inputs est constant
     
 
 def fitness_function(ga_instance, solution, nn_idx):
     """ Fonction de coût qui évalue la performance d'un réseau de neurones. """
-    global gann
-        
-    ses = Session(nb_pilots=len(nn_idx), generation=ga_instance.generations_completed)
-    states = ses.reset()
+    global gann, states
 
     while not ses.done:
-        print("LEN : ", len(nn_idx))
-        print(nn_idx)
-        print("STATES : ", states, len(states))
-        actions = [pygad.nn.predict(last_layer=gann.population_networks[nn], data_inputs=np.array(states[i]).reshape(1, 4)) for i, nn in enumerate(nn_idx)]
-        print("ACTIONS :", actions, "\n\n")
-        # actions = [[0]] * len(nn_idx)
-        states, scores = ses.step(np.array(actions).reshape(len(actions)))
+        actions = [pygad.kerasga.predict(model=model, solution=gann.population_weights[nn], data=np.array(states[i]).reshape(1, 4)) for i, nn in enumerate(nn_idx)]
+        actions = [1 if act > 0 else 0 for act in actions] # [0, 1, 1, 1, 1] 
+        states, scores = ses.step(actions)
         
+        print("ACTIONS :", actions, "\n\n")
     return scores
 
 
 
-def callback(ga_instance): 
-    global gann
-    population_matrices = pygad.gann.population_as_matrices(population_networks=gann.population_networks, population_vectors=ga_instance.population)
-    gann.update_population_trained_weights(population_trained_weights=population_matrices)
+def callback(ga_instance):
+    states = ses.reset()
     print(f"Generation: {ga_instance.generations_completed}, Best fitness: {ga_instance.best_solution()[1]}")
 
 
 
+model = tf.keras.Sequential([
+            tf.keras.layers.Input([4]),
+            tf.keras.layers.Dense(3, activation="elu"),
+            tf.keras.layers.Dense(3, activation="elu"),
+            tf.keras.layers.Dense(1)
+        ])
 
+gann = pygad.kerasga.KerasGA(model=model, num_solutions=POPULATION)
 
-# Création de la population initiale
-gann = pygad.gann.GANN(num_solutions=POPULATION,
-                       num_neurons_input=NN_LAYERS[0],
-                       num_neurons_hidden_layers=NN_LAYERS[1:-1],
-                       num_neurons_output=NN_LAYERS[-1], 
-                       hidden_activations="relu",
-                       output_activation="softmax",
-                       )
-
-
-# print(dir(gann))
-
-
-# for i, nn in enumerate(gann.population_networks):
-#     print(f"NN {i} Weights: {nn}\n")
-
-
-
-
-
-
-
-
-initial_pop = pygad.gann.population_as_vectors(population_networks=gann.population_networks)
+ses = Session(nb_pilots=BATCH)
+states = ses.reset()
 
 
 # Définition des paramètres de l'algorithme génétique
 ga_instance = pygad.GA(num_generations = N_GENERATIONS,
                     num_parents_mating = 10,
-                    initial_population = initial_pop,
+                    initial_population = gann.population_weights,
                     # sol_per_pop = POPULATION,
                     # num_genes = X,
                     fitness_func = fitness_function,

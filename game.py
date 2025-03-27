@@ -276,7 +276,9 @@ class Session:
         self.update(actions)
         self.draw()
         
-        if not any([item.alive for item in self.bird_list]):
+        
+        dones = [item.alive for item in self.bird_list]
+        if not any(dones):
             self.done = True
         
         if self.bird_list[0].bird_img_rect.left < self.pipes[0].pipe_img_rect.left:
@@ -291,7 +293,7 @@ class Session:
                 
         self.normalisation()
         
-        return self.states, self.scores
+        return self.states, self.scores, dones
 
 
     def normalisation(self):
