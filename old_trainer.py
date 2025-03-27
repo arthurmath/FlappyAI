@@ -2,8 +2,8 @@ import random as rd
 import pickle
 import os
 import matplotlib.pyplot as plt
-from pilot import Pilot
-from game import Session
+from old_pilot import Pilot
+from old_game import Session
 from pathlib import Path
 import copy as cp
 
@@ -48,14 +48,14 @@ class GeneticAlgo:
 
     def evaluate_generation(self):
             
-        self.ses = Session(POPULATION, self.generation)
+        self.ses = Session(POPULATION)
         states = self.ses.reset()
 
         while not self.ses.done:
             
             actions = [self.population[i].predict(states[i]) for i in range(len(self.population))]
             actions = [mat.tolist()[0][0] for mat in actions]
-            states, self.scores, _ = self.ses.step(actions)
+            states, self.scores = self.ses.step(actions)
             
         self.bestGenScore = max(self.scores)
         self.avgGenScore = sum(self.scores) / POPULATION
@@ -84,7 +84,7 @@ class GeneticAlgo:
         while len(self.new_population) < POPULATION:
             parent1, parent2 = self.select_parents()
             baby = parent1.mate(parent2)
-            baby.mutate()
+            baby.mutate() # useless
             self.new_population.append(baby)
         
         self.population = self.new_population
@@ -92,9 +92,9 @@ class GeneticAlgo:
     
     def select_parents(self):
         """Select two pilots with high scores."""
-        total_scores = sum(self.scores)
-        ratios = [f / total_scores for f in self.scores]
-        return rd.choices(self.bestPilots, k=2) # return a k-sized list 
+        total_scores = sum(self.bestscores)
+        ratios = [f / total_scores for f in self.bestscores]
+        return rd.choices(self.bestPilots, weights=ratios, k=2) # return a k-sized list
 
 
 
@@ -129,35 +129,40 @@ if __name__ == "__main__":
     # plt.xlabel("Générations")
     # plt.ylabel("Progression (%)")
     # plt.show()
-        
-            
-            
+    
+    
+    
+    
+    
+# Base : (self.bestPilots, weights=ratios), NN_LAYERS = [4, 3, 3, 1], Mutate useless
+# Generation 1, average score: 24, best score: 96
+# Generation 2, average score: 29, best score: 106
+# Generation 3, average score: 45, best score: 265
+# Generation 4, average score: 40, best score: 257
+# Generation 5, average score: 39, best score: 142
+# Generation 6, average score: 29, best score: 177
+# Generation 7, average score: 64, best score: 1387
+# Generation 8, average score: 189, best score: 2266
 
+# self.bestPilots
+# Generation 1, average score: 24, best score: 96
+# Generation 2, average score: 28, best score: 117
+# Generation 3, average score: 41, best score: 1347
+# Generation 4, average score: 54, best score: 2547
 
+# NN_LAYERS = [4, 5, 5, 1]
+# Generation 1, average score: 26, best score: 177
+# Generation 2, average score: 33, best score: 904
+# Generation 3, average score: 38, best score: 217
+# Generation 4, average score: 79, best score: 907
+# Generation 5, average score: 308, best score: 625
 
-
-# Atteinte d'un NN qui sait jouer est plus rapide sans weights=ratios
-
-
-
-
-# choice dans population avec ratios
-# Generation 1, average score: 25, best score: 177
-# Generation 2, average score: 26, best score: 218
-# Generation 3, average score: 30, best score: 306
-# Generation 4, average score: 32, best score: 257
-# Generation 5, average score: 40, best score: 861
-
-# choice dans bestPilots avec ratios
-# Generation 1, average score: 25, best score: 177
-# Generation 2, average score: 31, best score: 144
-# Generation 3, average score: 47, best score: 426
-# Generation 4, average score: 60, best score: 586
-# Generation 5, average score: 39, best score: 60
-# Generation 6, average score: 70, best score: 457
-
-# choice dans bestPilots sans ratios
-# Generation 1, average score: 25, best score: 177
-# Generation 2, average score: 30, best score: 946
-# Generation 3, average score: 41, best score: 1667
-
+# np.array (pilot line 43)
+# Generation 1, average score: 24, best score: 96
+# Generation 2, average score: 29, best score: 179
+# Generation 3, average score: 44, best score: 266
+# Generation 4, average score: 45, best score: 182
+# Generation 5, average score: 64, best score: 385
+# Generation 6, average score: 62, best score: 340
+# Generation 7, average score: 64, best score: 666
+# Generation 8, average score: 109, best score: 1499

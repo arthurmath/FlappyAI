@@ -1,10 +1,11 @@
 import random
 import numpy as np
-from pilot import Pilot
+from old_pilot import Pilot
 from pathlib import Path
 import pickle
 import sys
 import os
+import time
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame as pg
@@ -14,7 +15,7 @@ SEED = 42
 WIDTH = 1200
 HEIGHT = 600
 WHITE = (255, 255, 255)
-FPS = 30 
+FPS = 40 
 GRAVITY = 2      # Accélération due à la gravité
 JUMP_STRENGTH = -15  # Vélocité initiale du saut (négatif car va vers le haut)
 MAX_SPEED = 120  # Vitesse max de chute
@@ -97,7 +98,7 @@ class Pipe:
 
     def __init__(self, ses):
         self.ses = ses
-        self.hole = random.randint(-40, 200) 
+        self.hole = random.randint(-30, 200) 
         
         self.pipe_img = self.ses.pipe_img
         self.flipped_pipe = ses.flipped_pipe
@@ -106,14 +107,13 @@ class Pipe:
         self.pipe_img_rect.top = HEIGHT/2 + self.hole
         self.pipe_img_rect.right = WIDTH + 70
         self.flipped_pipe_rect = self.flipped_pipe.get_rect()
-        self.flipped_pipe_rect.top = HEIGHT/2 - 650 + self.hole
+        self.flipped_pipe_rect.top = HEIGHT/2 - 700 + self.hole
         self.flipped_pipe_rect.right = WIDTH + 70
         
     def update(self):
         if self.ses.loop_counter % self.add_new_pipe_rate == 0:
             self.ses.add_pipe = True
         
-        # Fait beuger le mouvement des pipes 
         if self.pipe_img_rect.left <= -70:
             self.ses.pipes.pop(0)
         else:
@@ -276,9 +276,7 @@ class Session:
         self.update(actions)
         self.draw()
         
-        
-        dones = [bird.alive for bird in self.bird_list]
-        if not any(dones):
+        if not any([bird.alive for bird in self.bird_list]):
             self.done = True
         
         if self.bird_list[0].bird_img_rect.left < self.pipes[0].pipe_img_rect.left:
@@ -293,7 +291,7 @@ class Session:
                 
         self.normalisation()
         
-        return self.states, self.scores, dones
+        return self.states, self.scores
 
 
     def normalisation(self):
@@ -306,9 +304,6 @@ class Session:
         """Transforme la valeur x initialement comprise dans l'intervalle [a, b]
             en une valeur comprise dans l'intervalle [-1, 1]."""
         return 2 * (x - a) / (b - a) - 1
-    
-    def close(self):
-        pg.quit()
 
 
 
@@ -329,22 +324,22 @@ if __name__ == '__main__':
         #################
         
         ### HUMAN ###
-        actions = [0]
-        for event in pg.event.get():
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RSHIFT:
-                    actions = [1]
-            if event.type == pg.KEYUP:
-                if event.key == pg.K_RSHIFT:
-                    actions = [0]
+        # actions = [0]
+        # for event in pg.event.get():
+        #     if event.type == pg.KEYDOWN:
+        #         if event.key == pg.K_RSHIFT:
+        #             actions = [1]
+        #     if event.type == pg.KEYUP:
+        #         if event.key == pg.K_RSHIFT:
+        #             actions = [0]
         #################
         
         ### SAVED WEIGHTS ###
-        # n_train = len(os.listdir(Path("weights"))) # nb de fichiers dans dossier weights
-        # with open(Path("weights") / Path(f"{n_train-1}.weights"), "rb") as f:
-        #     weights, bias = pickle.load(f)
-        #     agent = Pilot(weights, bias)
-        # actions = [agent.predict(states).tolist()[0][0]]
+        n_train = len(os.listdir(Path("weights"))) # nb de fichiers dans dossier weights
+        with open(Path("weights") / Path(f"{n_train-1}.weights"), "rb") as f:
+            weights, bias = pickle.load(f)
+            agent = Pilot(weights, bias)
+        actions = [agent.predict(states).tolist()[0][0]]
         #################
         
         states, scores = ses.step(actions)
@@ -353,13 +348,3 @@ if __name__ == '__main__':
     print(sorted(scores))
     pg.quit()
     sys.exit(0)
-    
-    
-
-
-
-
-
-
-
-

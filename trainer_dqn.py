@@ -18,7 +18,7 @@ LR = 1e-2
 N_STEPS = 200
 BATCH_SIZE = 16 # 32
 N_EPISODES = 100 # 600
-POPULATION = 100
+POPULATION = 10
 EPS_FACTOR = int(N_EPISODES * 5 / 6) 
 DISCOUNT_FACTOR = 0.95
 WEIGHTS_PATH = Path() / "weights"
@@ -46,13 +46,10 @@ class ReplayMemory:
     
     def __len__(self):
         return len(self.memory)
-
-
-
-
-
-
-class DeepQN:
+    
+    
+    
+class Neural_net:
     def __init__(self):
         
         self.input_shape = [4]
@@ -64,70 +61,85 @@ class DeepQN:
             tf.keras.layers.Dense(8, activation="elu"),
             tf.keras.layers.Dense(self.output_shape, activation="relu")
         ])
-        
-        self.target = tf.keras.models.clone_model(self.model)  # CHANGED
-        self.target.set_weights(self.model.get_weights())  # CHANGED
+
+
+
+
+class DeepQN:
+    
+    def __init__(self):
+        self.memory = ReplayMemory()
+        self.env = Session(POPULATION)
+        self.population = [Neural_net() for _ in range(POPULATION)]
         
         self.optimizer = tf.keras.optimizers.Nadam(learning_rate=LR)
         self.loss_fn = tf.keras.losses.MeanSquaredError()
         
         
-        
+
     def train(self):
         
-        self.env = Session(POPULATION)
-        self.memory = ReplayMemory()
-        rewards = [] 
-        best_score = 0
+        self.list_bests = []
+        self.list_avg = []
+        self.best_score_all = 0
 
-        for episode in range(N_EPISODES):
+        for self.generation in range(N_EPISODES):
             
-            state = self.env.reset()
+            self.evaluate_generation()
             
-            episode_reward = 0
-            for step in range(N_STEPS + 10 * episode):
-                epsilon = max(1 - episode / EPS_FACTOR, 0.01)
-                state, reward = self.play_one_step(state, epsilon)
-                episode_reward += reward
+            self.update_scores()
 
-            rewards.append(episode_reward)
-            if episode_reward >= best_score:
-                best_weights = self.model.get_weights()
-                best_score = episode_reward
-
-            if episode > int(BATCH_SIZE * 1.5):
+            if self.generation > int(BATCH_SIZE * 1.5):
                 self.training_step()
-                if episode % 50 == 0:                                  # CHANGED
-                    self.target.set_weights(self.model.get_weights())  # CHANGED
                 
-            print(f"Episode: {episode + 1}, reward: {episode_reward:.2f}, done at step {step}, nb collisions: {self.env.car.nbCollisions}")
+            print(f"Episode {self.generation+1}, avg score: {self.avg_score:.0f}, best score: {self.best_score}, done {self.end_step}")
             
-        self.env.close()
-        return rewards, best_weights
     
     
     
-    def play_one_step(self, state, epsilon):
-        action = self.epsilon_greedy_policy(state, epsilon)
-        next_state, reward, done = self.env.step(action)
-        self.memory.push(state, action, reward, next_state, done)
-        return next_state, reward
+    def evaluate_generation(self):
+            
+        self.epsilon = max(1 - self.generation / EPS_FACTOR, 0.01)
+        self.ses = Session(POPULATION, self.generation)
+        self.states = self.ses.reset()
+        self.end_step = 0
 
-
-    def epsilon_greedy_policy(self, state, epsilon):
-        if np.random.rand() < epsilon:
-            return np.random.randint(self.output_shape+1)  # random action # , size=POPULATION
+        while not self.ses.done:
+            actions = self.epsilon_greedy_policy()
+            
+            next_states, self.scores, dones = self.ses.step(actions)
+            
+            self.memory.push(self.states, actions, self.scores, next_states, dones)
+            self.end_step += 1
+            
+        
+    def epsilon_greedy_policy(self):
+        if np.random.rand() < self.epsilon:
+            return np.random.randint(self.population[0].output_shape+1, size=POPULATION)  # random action 
         else:
-            Q_values = self.model.predict(np.array(state)[np.newaxis, :], verbose=0)[0]
-            return Q_values.argmax()  # optimal action according to the DQN
+            Q_values = [self.population[i].model.predict(np.array(self.states[i]).reshape(1, 4), verbose=0)[0] for i in range(len(self.population))]
+            res = [1 if val > 0 else 0 for val in Q_values]
+            return res
+            
 
+            
+    def update_scores(self):
+        self.best_score = max(self.scores)
+        self.avg_score = sum(self.scores) / POPULATION
+        self.list_bests.append(self.best_score)
+        self.list_avg.append(self.avg_score)
+        
+        # if self.best_score >= self.best_score_all:
+        #     self.best_weights = self.model.get_weights()
+        #     self.best_score_all = self.best_score
+    
+    
 
     def training_step(self):
         
         states, actions, rewards, next_states, dones = self.memory.sample()
         
-        # next_Q_values = self.model.predict(np.array(next_states), verbose=0)
-        next_Q_values = self.target.predict(np.array(next_states), verbose=0)  # CHANGED
+        next_Q_values = self.model.predict(np.array(next_states), verbose=0)
         max_next_Q_values = next_Q_values.max(axis=1)
         runs = np.ones(len(dones)) - np.array(dones)
         target_Q_values = rewards + runs * DISCOUNT_FACTOR * max_next_Q_values
@@ -163,19 +175,21 @@ def main():
         #     dqn.model.set_weights(weights)
         
         start = time.time()
-        rewards, best_weights = dqn.train()
-        print(f"Durée entrainement avec {N_EPISODES} épisodes : {(time.time() - start)/60}min")
+        dqn.train()
+        print(f"\nDurée entrainement avec {N_EPISODES} épisodes : {(time.time() - start)/60}min\n")
         
         with open(WEIGHTS_PATH / Path(f"{n_train}.weights"), "wb") as f:
-            pickle.dump((best_weights), f)
+            pickle.dump((dqn.best_weights), f)
         
         plt.figure(figsize=(8, 4))
-        plt.plot(rewards)
-        plt.xlabel("Episode")
-        plt.ylabel("Sum of rewards")
+        plt.plot(dqn.list_avg, label='Average scores')
+        plt.plot(dqn.list_bests, label='Best scores')
+        plt.xlabel("Générations")
+        plt.ylabel("Scores (%)")
         plt.grid(True)
-        plt.tight_layout()
+        plt.legend()
         plt.show()
+
         
     else:
         with open(WEIGHTS_PATH / Path(f"colab3.weights"), "rb") as f:
@@ -184,15 +198,15 @@ def main():
         dqn.model.set_weights(weights)
         
         env = Session(display=True)
-        state, done = env.reset()
+        state = env.reset()
         done = False
 
-        print("start")
         while not done:
             moves = dqn.model.predict(np.array(state)[np.newaxis, :], verbose=0)[0].argmax()
             state, _, done = env.step(moves)
             done = False
-        env.close()
+    
+    dqn.env.close()
 
 
 
@@ -200,6 +214,7 @@ def main():
 
 if __name__=='__main__':
     main()
+    
 
 
     

@@ -2,7 +2,8 @@ import random as rd
 import numpy as np
 import random as rd
 from collections import deque
-# import tensorflow as tf
+import matplotlib.pyplot as plt
+import tensorflow as tf
 
 # SEED = 42
 # rd.seed(SEED)
@@ -36,29 +37,29 @@ from collections import deque
 
 
 
-class ReplayMemory:
-    def __init__(self, capacity):
-        self.memory = deque(maxlen=capacity)
+# class ReplayMemory:
+#     def __init__(self, capacity):
+#         self.memory = deque(maxlen=capacity)
     
-    def push(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done))
+#     def push(self, state, action, reward, next_state, done):
+#         self.memory.append((state, action, reward, next_state, done))
     
-    def sample(self):
-        samples = rd.sample(self.memory, 32)
-        return zip(*samples)
+#     def sample(self):
+#         samples = rd.sample(self.memory, 32)
+#         return zip(*samples)
     
-    def __len__(self):
-        return len(self.memory)
+#     def __len__(self):
+#         return len(self.memory)
     
     
-memory = ReplayMemory(100)
-for i in range(60):
-    memory.push(i, i, i, i, i)
+# memory = ReplayMemory(100)
+# for i in range(60):
+#     memory.push(i, i, i, i, i)
     
 
-batch_state, batch_action, batch_reward, batch_next_state, batch_done = memory.sample()
+# batch_state, batch_action, batch_reward, batch_next_state, batch_done = memory.sample()
 
-print(batch_state)
+# print(batch_state)
     
     
 
@@ -74,3 +75,23 @@ print(batch_state)
 #     replay_buffer.append((i, i, i, i, i))
     
 # print(sample_experiences())
+
+
+
+class Neural_net:
+    def __init__(self):
+        
+        self.input_shape = [4]
+        self.output_shape = 1 
+
+        self.model = tf.keras.Sequential([
+            tf.keras.layers.Input(self.input_shape),
+            tf.keras.layers.Dense(8, activation="elu"),
+            tf.keras.layers.Dense(8, activation="elu"),
+            tf.keras.layers.Dense(self.output_shape, activation="relu")
+        ])
+        
+
+nn = Neural_net()
+
+print(nn.model.predict(np.array([0.1, 0.2, 0.3, 0.4]).reshape(1, 4), verbose=100)[0])
