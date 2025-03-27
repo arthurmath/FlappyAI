@@ -53,7 +53,7 @@ class GeneticAlgo:
             actions = [self.population[i].predict(states[i]) for i in range(len(self.population))]
             actions = [mat.tolist()[0][0] for mat in actions]
             states, self.scores, _ = self.ses.step(actions)
-            
+        
         self.bestGenScore = max(self.scores)
         self.avgGenScore = sum(self.scores) / POPULATION
         self.list_scores.append(self.bestGenScore)

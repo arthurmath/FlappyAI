@@ -204,7 +204,6 @@ class Session:
         self.nb_pilots = nb_pilots
         
         self.load_images()
-        self.generate_objects()
          
     def load_images(self):
         bird_img = pg.image.load('images/bird.png').convert_alpha()
@@ -218,15 +217,9 @@ class Session:
         
         self.background_img = pg.image.load('images/background.png').convert()
         self.ground_img = pg.image.load('images/ground.png').convert()
-
-    def generate_objects(self):
-        self.bird_list = [Bird(self) for _ in range(self.nb_pilots)]
-        self.background = Background(self)
-        self.pipes = [Pipe(self)] 
-        self.ground = Ground(self, self.pipes)
-        self.score = Score(self)
     
     def reset(self, nn=None, generation=1):
+        self.generate_objects()
         self.states = []
         self.scores = [0] * self.nb_pilots
         self.nb_alive = self.nb_pilots
@@ -244,6 +237,13 @@ class Session:
             self.states.append([bird.bird_img_rect.top, bird.speed, next_pipe.hole, next_pipe.pipe_img_rect.right])   
         self.normalisation() 
         return self.states
+        
+    def generate_objects(self):
+        self.bird_list = [Bird(self) for _ in range(self.nb_pilots)]
+        self.background = Background(self)
+        self.pipes = [Pipe(self)] 
+        self.ground = Ground(self, self.pipes)
+        self.score = Score(self)      
         
     def update(self, actions):
         self.background.update()
@@ -268,8 +268,11 @@ class Session:
             pipe.draw()
         self.score.draw()
         self.ground.draw()
-        if 'self.best_nn' in locals():
+        try:
             self.draw_nn(self.best_nn)
+        except:
+            pass
+            
         pg.display.flip()
 
 
