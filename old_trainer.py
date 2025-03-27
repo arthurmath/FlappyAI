@@ -48,14 +48,14 @@ class GeneticAlgo:
 
     def evaluate_generation(self):
             
-        self.ses = Session(POPULATION)
+        self.ses = Session(POPULATION, self.generation)
         states = self.ses.reset()
 
         while not self.ses.done:
             
             actions = [self.population[i].predict(states[i]) for i in range(len(self.population))]
             actions = [mat.tolist()[0][0] for mat in actions]
-            states, self.scores = self.ses.step(actions)
+            states, self.scores, _ = self.ses.step(actions)
             
         self.bestGenScore = max(self.scores)
         self.avgGenScore = sum(self.scores) / POPULATION
@@ -94,7 +94,7 @@ class GeneticAlgo:
         """Select two pilots with high scores."""
         total_scores = sum(self.bestscores)
         ratios = [f / total_scores for f in self.bestscores]
-        return rd.choices(self.bestPilots, weights=ratios, k=2) # return a k-sized list
+        return rd.choices(self.bestPilots, weights=ratios, k=2) # return a k-sized list # weights=ratios,
 
 
 
@@ -156,6 +156,10 @@ if __name__ == "__main__":
 # Generation 3, average score: 38, best score: 217
 # Generation 4, average score: 79, best score: 907
 # Generation 5, average score: 308, best score: 625
+# Generation 6, average score: 158, best score: 1027
+# Generation 7, average score: 271, best score: 944
+# Generation 8, average score: 151, best score: 906
+# Generation 9, average score: 125, best score: 146
 
 # np.array (pilot line 43)
 # Generation 1, average score: 24, best score: 96

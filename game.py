@@ -97,7 +97,8 @@ class Pipe:
 
     def __init__(self, ses):
         self.ses = ses
-        self.hole = random.randint(-40, 200) 
+        self.hole = random.randint(-30, 200) # old
+        # self.hole = random.randint(-40, 200) 
         
         self.pipe_img = self.ses.pipe_img
         self.flipped_pipe = ses.flipped_pipe
@@ -106,7 +107,8 @@ class Pipe:
         self.pipe_img_rect.top = HEIGHT/2 + self.hole
         self.pipe_img_rect.right = WIDTH + 70
         self.flipped_pipe_rect = self.flipped_pipe.get_rect()
-        self.flipped_pipe_rect.top = HEIGHT/2 - 650 + self.hole
+        self.flipped_pipe_rect.top = HEIGHT/2 - 700 + self.hole # old
+        # self.flipped_pipe_rect.top = HEIGHT/2 - 650 + self.hole
         self.flipped_pipe_rect.right = WIDTH + 70
         
     def update(self):
@@ -275,7 +277,6 @@ class Session:
         self.loop_counter += 1
         self.update(actions)
         self.draw()
-        
         
         dones = [bird.alive for bird in self.bird_list]
         if not any(dones):

@@ -40,7 +40,7 @@ class Pilot():
         self.bias = []
         for layer in self.weights:
             nbrBias = np.size(layer, axis=1)
-            self.bias.append(np.matrix([rd.uniform(-1, 1) for _ in range(nbrBias)])) # rd.gauss(0, 0.5)
+            self.bias.append(np.array([rd.uniform(-1, 1) for _ in range(nbrBias)])) # rd.gauss(0, 0.5)
             
     
     def predict(self, vector):

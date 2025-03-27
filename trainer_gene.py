@@ -3,7 +3,7 @@ import pickle
 import os
 import matplotlib.pyplot as plt
 from pilot import Pilot
-from game import Session
+from old_game import Session
 from pathlib import Path
 import copy as cp
 
@@ -84,7 +84,7 @@ class GeneticAlgo:
         while len(self.new_population) < POPULATION:
             parent1, parent2 = self.select_parents()
             baby = parent1.mate(parent2)
-            baby.mutate()
+            # baby.mutate()
             self.new_population.append(baby)
         
         self.population = self.new_population
@@ -94,7 +94,7 @@ class GeneticAlgo:
         """Select two pilots with high scores."""
         total_scores = sum(self.scores)
         ratios = [f / total_scores for f in self.scores]
-        return rd.choices(self.bestPilots, k=2) # return a k-sized list 
+        return rd.choices(self.bestPilots, k=2) # return a k-sized list # weights=ratios,
 
 
 

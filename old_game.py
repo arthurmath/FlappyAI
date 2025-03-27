@@ -5,7 +5,6 @@ from pathlib import Path
 import pickle
 import sys
 import os
-import time
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame as pg
@@ -15,7 +14,7 @@ SEED = 42
 WIDTH = 1200
 HEIGHT = 600
 WHITE = (255, 255, 255)
-FPS = 40 
+FPS = 30 
 GRAVITY = 2      # Accélération due à la gravité
 JUMP_STRENGTH = -15  # Vélocité initiale du saut (négatif car va vers le haut)
 MAX_SPEED = 120  # Vitesse max de chute
@@ -276,7 +275,8 @@ class Session:
         self.update(actions)
         self.draw()
         
-        if not any([bird.alive for bird in self.bird_list]):
+        dones = [bird.alive for bird in self.bird_list]
+        if not any(dones):
             self.done = True
         
         if self.bird_list[0].bird_img_rect.left < self.pipes[0].pipe_img_rect.left:
@@ -291,7 +291,7 @@ class Session:
                 
         self.normalisation()
         
-        return self.states, self.scores
+        return self.states, self.scores, dones
 
 
     def normalisation(self):
