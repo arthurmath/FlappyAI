@@ -13,9 +13,6 @@ POPULATION = 500
 SURVIVAL_RATE = 0.1
 N_GENERATIONS = 20
 
-# Autres paramètres :
-# nombre de layers NN
-# fonctions activation 
 
 
 
@@ -26,6 +23,7 @@ class GeneticAlgo:
         
         self.list_scores = []
         
+        self.ses = Session(POPULATION, display=True)
         self.population = [Pilot() for _ in range(POPULATION)]
 
         for self.generation in range(N_GENERATIONS):
@@ -48,8 +46,7 @@ class GeneticAlgo:
 
     def evaluate_generation(self):
             
-        self.ses = Session(POPULATION, self.generation, display=False)
-        states = self.ses.reset()
+        states = self.ses.reset(self.population[0], self.generation)
 
         while not self.ses.done:
             

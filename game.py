@@ -192,7 +192,7 @@ class Score:
 
 
 class Session:
-    def __init__(self, nb_pilots=10, generation=1, display=True):
+    def __init__(self, nb_pilots=10, display=True):
         pg.init()
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -201,15 +201,7 @@ class Session:
         self.text = pg.font.SysFont('forte', 30)
         self.highscore = 0
         self.display = display
-        self.done = False
-        self.quit = False
-        self.loop_counter = 0
-        self.level = 1
-        self.level_up_rate = 250
         self.nb_pilots = nb_pilots
-        self.add_pipe = False
-        self.nb_alive = nb_pilots
-        self.generation = generation
         
         self.load_images()
         self.generate_objects()
@@ -234,10 +226,20 @@ class Session:
         self.ground = Ground(self, self.pipes)
         self.score = Score(self)
     
-    def reset(self):
+    def reset(self, nn=None, generation=1):
         self.states = []
         self.scores = [0] * self.nb_pilots
+        self.nb_alive = self.nb_pilots
+        self.generation = generation
         next_pipe = self.pipes[0]
+        self.level_up_rate = 250
+        self.loop_counter = 0
+        self.add_pipe = False
+        self.done = False
+        self.quit = False
+        self.level = 1
+        if nn is not None:
+            self.best_nn = nn
         for bird in self.bird_list:
             self.states.append([bird.bird_img_rect.top, bird.speed, next_pipe.hole, next_pipe.pipe_img_rect.right])   
         self.normalisation() 
@@ -266,6 +268,8 @@ class Session:
             pipe.draw()
         self.score.draw()
         self.ground.draw()
+        if 'self.best_nn' in locals():
+            self.draw_nn(self.best_nn)
         pg.display.flip()
 
 
@@ -310,6 +314,35 @@ class Session:
             en une valeur comprise dans l'intervalle [-1, 1]."""
         return 2 * (x - a) / (b - a) - 1
     
+    
+    def draw_nn(self, network):
+        network = network.weights
+
+        # Nombre de neurones par couche
+        layer_sizes = [network[0].shape[0]] + [w.shape[1] for w in network]
+
+        # Positions des neurones
+        x_spacing = 70 
+        neuron_positions = []
+        for i, layer_size in enumerate(layer_sizes):
+            y_spacing = 150 // (layer_size + 1)
+            neuron_positions.append([(900 + x_spacing * (i + 1), y_spacing * (j + 1)) for j in range(layer_size)])
+
+        # Dessiner les connexions
+        for i in range(len(network)):
+            for j, neuron1 in enumerate(neuron_positions[i]):
+                for k, neuron2 in enumerate(neuron_positions[i + 1]):
+                    weight = network[i][j, k]
+                    color = (255, 0, 0) if weight > 0 else (0, 0, 255)  # Rouge pour positif, bleu pour négatif
+                    thickness = int(abs(weight) * 3)  # Épaisseur proportionnelle au poids
+                    pg.draw.line(self.screen, color, neuron1, neuron2, thickness)
+
+        # Dessiner les neurones
+        for layer in neuron_positions:
+            for x, y in layer:
+                pg.draw.circle(self.screen, WHITE, (x, y), 5)  # Neurones en noir
+
+    
     def close(self):
         pg.quit()
 
@@ -350,7 +383,7 @@ if __name__ == '__main__':
         # actions = [agent.predict(states).tolist()[0][0]]
         #################
         
-        states, scores = ses.step(actions)
+        states, scores, _ = ses.step(actions)
         # print([round(x, 2) for x in states[0]])
     
     print(sorted(scores))

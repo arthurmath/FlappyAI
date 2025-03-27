@@ -92,23 +92,6 @@ class Pilot():
             ))
         return res
     
-    def cross_layer2(self, layer1, layer2):
-        """ GeneticFlappyBird JS method """
-        res = layer1
-        
-        if len(layer1.shape) == 1:  # 1D case
-            for i in range(len(layer1)):
-                if rd.random() > 0.5:
-                        res[i] = layer2[i]
-            
-        else:
-            for i in range(len(layer1)):
-                for j in range(len(layer1[0])):
-                    if rd.random() > 0.5:
-                        res[i, j] = layer2[i, j]
-        
-        return res
-    
 
     def mutate(self):
         for i, layer in enumerate(self.weights):
@@ -161,3 +144,20 @@ if __name__ == '__main__':
     
     
     
+    
+# def cross_layer2(self, layer1, layer2):
+#     """ GeneticFlappyBird JS method """
+#     res = layer1
+    
+#     if len(layer1.shape) == 1:  # 1D case
+#         for i in range(len(layer1)):
+#             if rd.random() > 0.5:
+#                     res[i] = layer2[i]
+        
+#     else:
+#         for i in range(len(layer1)):
+#             for j in range(len(layer1[0])):
+#                 if rd.random() > 0.5:
+#                     res[i, j] = layer2[i, j]
+    
+#     return res

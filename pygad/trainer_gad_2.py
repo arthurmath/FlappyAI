@@ -33,7 +33,7 @@ def fitness_function(ga_instance, solution, nn_idx):
 
 
 
-def callback(ga_instance):
+def new_gen(ga_instance):
     states = ses.reset()
     print(f"Generation: {ga_instance.generations_completed}, Best fitness: {ga_instance.best_solution()[1]}")
 
@@ -69,7 +69,7 @@ ga_instance = pygad.GA(num_generations = N_GENERATIONS,
                     random_seed = SEED,
                     fitness_batch_size = BATCH,
                     # parallel_processing = 5,
-                    on_generation=callback,
+                    on_generation=new_gen,
                     )
 
 # Exécution de l'algorithme génétique
