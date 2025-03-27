@@ -1,12 +1,11 @@
-import random as rd
-import pickle
-import os
 import matplotlib.pyplot as plt
 from pilot import Pilot
 from game import Session
 from pathlib import Path
+import random as rd
 import copy as cp
-
+import pickle
+import os
 
     
 POPULATION = 500
@@ -219,7 +218,7 @@ if __name__ == "__main__":
 # Generation 11, average score: 91, best score: 426
 # Generation 12, average score: 79, best score: 387
 
-# std=0.1
+# STD=0.1
 # Generation 1, average score: 26, best score: 137
 # Generation 2, average score: 29, best score: 187
 # Generation 3, average score: 33, best score: 141
@@ -234,3 +233,5 @@ if __name__ == "__main__":
 # Generation 12, average score: 222, best score: 2347
 # Generation 13, average score: 233, best score: 1265
 # Generation 14, average score: 287, best score: 2700
+
+# Best params : (bestPilots, weights=ratios), [4,5,5,1], MR=0.1, STD=0.1
