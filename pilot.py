@@ -77,7 +77,7 @@ class Pilot():
         res = [self.cross_layer(dna1[layer], dna2[layer]) for layer in range(len(dna1))]
         return res
 
-    def cross_layer(self, layer1, layer2): # better
+    def cross_layer(self, layer1, layer2): 
         """ Performs a crossover on two layers """
         
         lineCut = rd.randint(0, layer1.shape[0] - 1)

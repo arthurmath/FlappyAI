@@ -365,25 +365,25 @@ if __name__ == '__main__':
         ### RANDOM ###
         # proba = 0.9
         # actions = np.random.choice(2, p=[proba, 1-proba], size=nb_birds)
-        #################
+        ################
         
         ### HUMAN ###
-        actions = [0]
-        for event in pg.event.get():
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RSHIFT:
-                    actions = [1]
-            if event.type == pg.KEYUP:
-                if event.key == pg.K_RSHIFT:
-                    actions = [0]
+        # actions = [0]
+        # for event in pg.event.get():
+        #     if event.type == pg.KEYDOWN:
+        #         if event.key == pg.K_RSHIFT:
+        #             actions = [1]
+        #     if event.type == pg.KEYUP:
+        #         if event.key == pg.K_RSHIFT:
+        #             actions = [0]
         #################
         
         ### SAVED WEIGHTS ###
-        # n_train = len(os.listdir(Path("weights"))) # nb de fichiers dans dossier weights
-        # with open(Path("weights") / Path(f"{n_train-1}.weights"), "rb") as f:
-        #     weights, bias = pickle.load(f)
-        #     agent = Pilot(weights, bias)
-        # actions = [agent.predict(states).tolist()[0][0]]
+        n_train = len(os.listdir(Path("weights"))) # nb de fichiers dans dossier weights
+        with open(Path("weights") / Path(f"{n_train-1}.weights"), "rb") as f:
+            weights, bias = pickle.load(f)
+            agent = Pilot(weights, bias)
+        actions = [agent.predict(states).tolist()[0][0]]
         #################
         
         states, scores, _ = ses.step(actions)

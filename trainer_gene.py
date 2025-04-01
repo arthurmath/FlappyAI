@@ -75,10 +75,10 @@ class GeneticAlgo:
     def change_generation(self):
         """ Creates a new generation of pilot. """
         
-        self.new_population = cp.copy(self.bestPilots) # 10% best pilots
+        self.new_population = cp.deepcopy(self.bestPilots) # 10% best pilots
         
         while len(self.new_population) < POPULATION:
-            parent1, parent2 = self.select_parents()
+            parent1, parent2 = cp.deepcopy(self.select_parents())
             baby = parent1.mate(parent2)
             baby.mutate()
             self.new_population.append(baby)
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     
     
     
-    # # Save the weights and biases of the snakes for the new game scores
+    # # Save the weights and biases of the best pilot
     # files = os.listdir(Path("weights"))
     # n_train = len(files) # nb de fichiers dans dossier weights
     # with open(Path("weights") / Path(f"{n_train}.weights"), "wb") as f: # write binary
