@@ -27,7 +27,7 @@ class GeneticAlgo:
 
         for self.generation in range(N_GENERATIONS):
             
-            self.evaluate_generation()        
+            self.evaluate_generation()     
             self.bests_survives()
             self.change_generation()
             

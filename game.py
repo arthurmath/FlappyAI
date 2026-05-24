@@ -14,7 +14,7 @@ SEED = 42
 WIDTH = 1200
 HEIGHT = 600
 WHITE = (255, 255, 255)
-FPS = 100 
+FPS = 50 
 GRAVITY = 2      # Accélération due à la gravité
 JUMP_STRENGTH = -15  # Vélocité initiale du saut (négatif car va vers le haut)
 MAX_SPEED = 120  # Vitesse max de chute
@@ -368,22 +368,22 @@ if __name__ == '__main__':
         ################
         
         ### HUMAN ###
-        # actions = [0]
-        # for event in pg.event.get():
-        #     if event.type == pg.KEYDOWN:
-        #         if event.key == pg.K_RSHIFT:
-        #             actions = [1]
-        #     if event.type == pg.KEYUP:
-        #         if event.key == pg.K_RSHIFT:
-        #             actions = [0]
+        actions = [0]
+        for event in pg.event.get():
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RSHIFT:
+                    actions = [1]
+            if event.type == pg.KEYUP:
+                if event.key == pg.K_RSHIFT:
+                    actions = [0]
         #################
         
         ### SAVED WEIGHTS ###
-        n_train = len(os.listdir(Path("weights"))) # nb de fichiers dans dossier weights
-        with open(Path("weights") / Path(f"{n_train-1}.weights"), "rb") as f:
-            weights, bias = pickle.load(f)
-            agent = Pilot(weights, bias)
-        actions = [agent.predict(states).tolist()[0][0]]
+        # n_train = len(os.listdir(Path("weights"))) # nb de fichiers dans dossier weights
+        # with open(Path("weights") / Path(f"{n_train-1}.weights"), "rb") as f:
+        #     weights, bias = pickle.load(f)
+        #     agent = Pilot(weights, bias)
+        # actions = [agent.predict(states).tolist()[0][0]]
         #################
         
         states, scores, _ = ses.step(actions)
